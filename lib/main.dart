@@ -1,4 +1,4 @@
-import 'package:edoc/app.dart';
+import 'package:edoc/correspondences/minuted_view_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +13,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: MainApp());
+    return const MaterialApp(home: MinutedView1());
   }
 }
