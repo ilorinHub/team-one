@@ -142,8 +142,7 @@ class _MinutedView1State extends State<MinutedView1> {
               ],
             ),
             drawer: const MobileDrawer(),
-            body: Expanded(
-                child: Scaffold(
+            body: Scaffold(
               body: SfPdfViewer.asset(
                 'assets/books/hackathon.pdf',
                 canShowPasswordDialog: true,
@@ -162,7 +161,7 @@ class _MinutedView1State extends State<MinutedView1> {
                   }
                 },
               ),
-            )),
+            ),
           )
         : Row(
             children: [
@@ -438,9 +437,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 await showDialog(
                     context: context,
                     builder: (context) {
-                      return SizedBox(
-                          width: 250,
-                          height: 250,
+                      return Dialog(
+                          // width: 250,
+                          // height: 250,
                           child: Image.network(
                               'https://images.unsplash.com/photo-1460472178825-e5240623afd5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=869&q=80'));
                     });
