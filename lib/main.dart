@@ -1,6 +1,7 @@
-import 'package:edoc/correspondences/minuted_view_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'app.dart';
 
 void main() {
   runApp(const ProviderScope(
@@ -13,6 +14,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: MinutedView1());
+    return MaterialApp(
+      home: const MainApp(),
+      theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+              color: Colors.white,
+              elevation: 0,
+              centerTitle: false,
+              iconTheme: IconThemeData(color: Colors.black),
+              titleTextStyle: TextStyle(color: Colors.black, fontSize: 24))),
+    );
   }
 }

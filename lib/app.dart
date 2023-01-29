@@ -47,9 +47,10 @@ class MainApp extends ConsumerWidget {
     });
 
     return Scaffold(
-      body: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        ismobile != true
-            ? SideMenu(
+      appBar: AppBar(),
+      body: !ismobile
+          ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              SideMenu(
                 items: sideMenuItems,
                 controller: sideMenuController,
                 style: SideMenuStyle(
@@ -74,19 +75,20 @@ class MainApp extends ConsumerWidget {
                   backgroundColor: const Color.fromARGB(255, 79, 117, 134),
                   // openSideMenuWidth: 200
                 ),
-              )
-            : Container(),
-        Expanded(
-            child: PageView(
-          controller: pageController,
-          children: const [
-            DashboardView(),
-            SearchView(),
-            NotificationsView(),
-            ProfileView()
-          ],
-        ))
-      ]),
+              ),
+              if (!ismobile)
+                Expanded(
+                    child: PageView(
+                  controller: pageController,
+                  children: const [
+                    DashboardView(),
+                    SearchView(),
+                    NotificationsView(),
+                    ProfileView()
+                  ],
+                ))
+            ])
+          : getContent(ref),
       bottomNavigationBar: ismobile
           ? BottomNavigationBar(
               currentIndex:
@@ -95,6 +97,8 @@ class MainApp extends ConsumerWidget {
                 ref.watch(currentPage.notifier).state =
                     _BottomNavBarItems.values[selected];
               },
+              selectedItemColor: Colors.blue,
+              unselectedItemColor: Colors.grey,
               items: _BottomNavBarItems.values.map((e) {
                 Widget icon = const Icon(Icons.person);
                 String label = '';
@@ -120,6 +124,21 @@ class MainApp extends ConsumerWidget {
               }).toList())
           : null,
     );
+  }
+
+  getContent(WidgetRef widget) {
+    widget.watch(currentPage);
+    switch (widget.watch(currentPage)) {
+      case _BottomNavBarItems.dashboard:
+        return const DashboardView();
+      case _BottomNavBarItems.search:
+        return const SearchView();
+      case _BottomNavBarItems.notifications:
+        return const NotificationsView();
+
+      default:
+        return const DashboardView();
+    }
   }
 }
 
