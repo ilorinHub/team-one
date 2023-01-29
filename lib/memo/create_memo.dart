@@ -1,5 +1,7 @@
 import 'package:edoc/memo/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class CreateMemoScreen extends StatefulWidget {
   const CreateMemoScreen({super.key});
@@ -22,11 +24,50 @@ class _MyWidgetState extends State<CreateMemoScreen> {
     'Procurement',
     'Hardware',
   ];
+  final SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize();
+    setState(() {});
+  }
+
+  /// Each time to start a speech recognition session
+  void _startListening() async {
+    await _speechToText.listen(onResult: _onSpeechResult);
+    setState(() {});
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+  /// This is the callback that the SpeechToText plugin calls when
+  /// the platform returns recognized words.
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {}, label: const Text('Speech to Text')),
+          onPressed:
+              // If not yet listening for speech start, otherwise stop
+              _speechToText.isNotListening ? _startListening : _stopListening,
+          tooltip: 'Listen',
+          label: _speechToText.isNotListening
+              ? const Text('Speech to Text')
+              : const Icon(Icons.mic)),
       appBar: AppBar(
         title: const Text('Create Memo'),
       ),
@@ -51,7 +92,13 @@ class _MyWidgetState extends State<CreateMemoScreen> {
               TextFormField(
                 minLines: 5,
                 maxLines: 10,
-                decoration: const InputDecoration(hintText: 'body'),
+                decoration: InputDecoration(hintText: _lastWords
+                    // _speechToText.isListening
+                    //     ? _lastWords
+                    //     : _speechEnabled
+                    //         ? 'Tap the microphone to start listening...'
+                    //         : 'Speech not available',
+                    ),
               )
             ],
           )),

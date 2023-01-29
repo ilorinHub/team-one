@@ -1,5 +1,9 @@
+import 'package:edoc/correspondences/incoming_view.dart';
+import 'package:edoc/correspondences/minuted_view.dart';
+import 'package:edoc/correspondences/outgoing_view.dart';
 import 'package:edoc/memo/create_letter.dart';
 import 'package:edoc/memo/create_memo.dart';
+import 'package:edoc/ocr.dart';
 import 'package:flutter/material.dart';
 
 class DashboardView extends StatelessWidget {
@@ -30,7 +34,13 @@ class DashboardView extends StatelessWidget {
                             width: ismobile ? size.width * 0.4 : 200,
                             height: 100,
                             child: ListTile(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const IncomingView()));
+                              },
                               leading: const Icon(Icons.call_received),
                               title: const Text("Incoming"),
                               subtitle: const Text('50'),
@@ -40,7 +50,13 @@ class DashboardView extends StatelessWidget {
                             width: ismobile ? size.width * 0.4 : 200,
                             height: 100,
                             child: ListTile(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const OutgoingView()));
+                              },
                               leading: const Icon(Icons.outbond),
                               title: const Text("Outgoing"),
                               subtitle: const Text("30"),
@@ -56,7 +72,10 @@ class DashboardView extends StatelessWidget {
                       width: 200,
                       height: 75,
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const MinutedView()));
+                        },
                         leading: const Icon(Icons.task),
                         title: const Text("Assigned Tasks"),
                         subtitle: const Text('50'),
@@ -113,7 +132,12 @@ class DashboardView extends StatelessWidget {
                     width: ismobile ? size.width * 0.4 : 250,
                     height: 75,
                     child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return OCRecognition();
+                          }));
+                        },
                         leading: const Icon(Icons.scanner),
                         title: Text(
                           "Upload Item",

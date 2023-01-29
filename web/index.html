@@ -46,6 +46,22 @@
   <script type="text/javascript">
     pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
   </script>
+  <script src='https://unpkg.com/tesseract.js@2.1.0/dist/tesseract.min.js'></script>
+  <script>
+    async function _extractText(imagePath, mapData) {
+      var worker = Tesseract.createWorker();
+      await worker.load();
+      await worker.loadLanguage(mapData.language)
+      await worker.initialize(mapData.language)
+      await worker.setParameters(mapData.args)
+      var rtn = await worker.recognize(imagePath, {}, worker.id);
+      await worker.terminate();
+      if (mapData.args["tessjs_create_hocr"]) {
+        return rtn.data.hocr;
+      }
+      return rtn.data.text;
+    }
+  </script>
   <script>
     window.addEventListener('load', function (ev) {
       // Download main.dart.js

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:edoc/correspondences/minuted_view_details.dart';
 import 'package:flutter/material.dart';
 
@@ -17,9 +15,7 @@ class MinutedView extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                    return Random().nextInt(2) == 1
-                        ? MinutedView1()
-                        : const MinutedView2();
+                    return const MinutedView1();
                   }));
                 },
                 leading: Text('From: ${e.senderName}'),

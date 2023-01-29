@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:text_to_speech/text_to_speech.dart';
 
 class MinutedView1 extends StatefulWidget {
   const MinutedView1({Key? key}) : super(key: key);
@@ -26,6 +27,8 @@ class _MinutedView1State extends State<MinutedView1> {
     super.initState();
   }
 
+  TextToSpeech tts = TextToSpeech();
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -33,6 +36,7 @@ class _MinutedView1State extends State<MinutedView1> {
         Expanded(
             child: Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.blue,
             actions: <Widget>[
               IconButton(
                 icon: const Icon(
@@ -81,6 +85,16 @@ class _MinutedView1State extends State<MinutedView1> {
                   }
                 },
               ),
+              IconButton(
+                icon: const Icon(
+                  Icons.record_voice_over,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  var data = await Clipboard.getData('text/plain');
+                  data != null ? tts.speak(data.text!) : null;
+                },
+              ),
               Visibility(
                 visible: _searchResult.hasResult,
                 child: IconButton(
@@ -121,8 +135,8 @@ class _MinutedView1State extends State<MinutedView1> {
               ),
             ],
           ),
-          body: SfPdfViewer.network(
-            'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',
+          body: SfPdfViewer.asset(
+            'assets/books/hackathon.pdf',
             canShowPasswordDialog: true,
             controller: _pdfViewerController,
             key: _pdfViewerKey,
@@ -141,7 +155,7 @@ class _MinutedView1State extends State<MinutedView1> {
         )),
         Expanded(
             child: Scaffold(
-          appBar: AppBar(),
+          appBar: AppBar(backgroundColor: Colors.blue),
           body: SizedBox(
               height: MediaQuery.of(context).size.height * 0.8,
               child: SingleChildScrollView(
@@ -220,15 +234,6 @@ class _MinutedView1State extends State<MinutedView1> {
       ),
     );
     overlayState.insert(_overlayEntry!);
-  }
-}
-
-class MinutedView2 extends StatelessWidget {
-  const MinutedView2({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
 
