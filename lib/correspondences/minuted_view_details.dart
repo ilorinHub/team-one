@@ -1,3 +1,4 @@
+import 'package:edoc/correspondences/mobile_drawer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,190 +32,327 @@ class _MinutedView1State extends State<MinutedView1> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blue,
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(
-                  Icons.keyboard_arrow_up,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _pdfViewerController!.previousPage();
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _pdfViewerController!.nextPage();
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.bookmark,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _pdfViewerKey.currentState?.openBookmarkView();
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _searchResult = _pdfViewerController!.searchText(
-                    'the',
-                  );
-                  if (kIsWeb) {
-                    setState(() {});
-                  } else {
-                    _searchResult.addListener(() {
-                      if (_searchResult.hasResult) {
-                        setState(() {});
-                      }
-                    });
-                  }
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.record_voice_over,
-                  color: Colors.white,
-                ),
-                onPressed: () async {
-                  var data = await Clipboard.getData('text/plain');
-                  data != null ? tts.speak(data.text!) : null;
-                },
-              ),
-              Visibility(
-                visible: _searchResult.hasResult,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.clear,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _searchResult.clear();
-                    });
-                  },
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    return isMobile
+        ? Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.blue,
+              leading: Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               ),
-              Visibility(
-                visible: _searchResult.hasResult,
-                child: IconButton(
+              actions: <Widget>[
+                IconButton(
                   icon: const Icon(
                     Icons.keyboard_arrow_up,
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    _searchResult.previousInstance();
+                    _pdfViewerController!.previousPage();
                   },
                 ),
-              ),
-              Visibility(
-                visible: _searchResult.hasResult,
-                child: IconButton(
+                IconButton(
                   icon: const Icon(
                     Icons.keyboard_arrow_down,
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    _searchResult.nextInstance();
+                    _pdfViewerController!.nextPage();
                   },
                 ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.bookmark,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    _pdfViewerKey.currentState?.openBookmarkView();
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    _searchResult = _pdfViewerController!.searchText(
+                      'the',
+                    );
+                    if (kIsWeb) {
+                      setState(() {});
+                    } else {
+                      _searchResult.addListener(() {
+                        if (_searchResult.hasResult) {
+                          setState(() {});
+                        }
+                      });
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.record_voice_over,
+                    color: Colors.white,
+                  ),
+                  onPressed: () async {
+                    var data = await Clipboard.getData('text/plain');
+                    data != null ? tts.speak(data.text!) : null;
+                  },
+                ),
+                Visibility(
+                  visible: _searchResult.hasResult,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.clear,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _searchResult.clear();
+                      });
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: _searchResult.hasResult,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_up,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _searchResult.previousInstance();
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: _searchResult.hasResult,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _searchResult.nextInstance();
+                    },
+                  ),
+                ),
+              ],
+            ),
+            drawer: const MobileDrawer(),
+            body: Expanded(
+                child: Scaffold(
+              body: SfPdfViewer.asset(
+                'assets/books/hackathon.pdf',
+                canShowPasswordDialog: true,
+                controller: _pdfViewerController,
+                key: _pdfViewerKey,
+                currentSearchTextHighlightColor: Colors.yellow.withOpacity(0.6),
+                otherSearchTextHighlightColor: Colors.yellow.withOpacity(0.3),
+                onTextSelectionChanged:
+                    (PdfTextSelectionChangedDetails details) {
+                  if (details.selectedText == null && _overlayEntry != null) {
+                    _overlayEntry?.remove();
+                    _overlayEntry = null;
+                  } else if (details.selectedText != null &&
+                      _overlayEntry == null) {
+                    _showContextMenu(context, details);
+                  }
+                },
               ),
-            ],
-          ),
-          body: SfPdfViewer.asset(
-            'assets/books/hackathon.pdf',
-            canShowPasswordDialog: true,
-            controller: _pdfViewerController,
-            key: _pdfViewerKey,
-            currentSearchTextHighlightColor: Colors.yellow.withOpacity(0.6),
-            otherSearchTextHighlightColor: Colors.yellow.withOpacity(0.3),
-            onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
-              if (details.selectedText == null && _overlayEntry != null) {
-                _overlayEntry?.remove();
-                _overlayEntry = null;
-              } else if (details.selectedText != null &&
-                  _overlayEntry == null) {
-                _showContextMenu(context, details);
-              }
-            },
-          ),
-        )),
-        Expanded(
-            child: Scaffold(
-          appBar: AppBar(backgroundColor: Colors.blue),
-          body: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: SingleChildScrollView(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const SizedBox(
-                        height: 20,
+            )),
+          )
+        : Row(
+            children: [
+              Expanded(
+                  child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.blue,
+                  actions: <Widget>[
+                    IconButton(
+                      icon: const Icon(
+                        Icons.keyboard_arrow_up,
+                        color: Colors.white,
                       ),
-                      const Text("MINUTES", style: TextStyle(fontSize: 20)),
-                      const SizedBox(
-                        height: 20,
+                      onPressed: () {
+                        _pdfViewerController!.previousPage();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white,
                       ),
-                      const MyStatefulWidget(),
-                      const SizedBox(
-                        height: 20,
+                      onPressed: () {
+                        _pdfViewerController!.nextPage();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.bookmark,
+                        color: Colors.white,
                       ),
-                      DropdownButton(
-                          hint: const Text("Select Reciever"),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'Engr gambo',
-                              child: Text("Engr Gambo"),
-                            ),
-                            DropdownMenuItem(
-                                value: "Mrs. Ake", child: Text("Mrs. Ake")),
-                            DropdownMenuItem(
-                                value: "Engr sabo", child: Text("Engr Sabo")),
-                          ],
-                          onChanged: (selected) {}),
-                      RadioGroup<ChatOptions>.builder(
-                        direction: Axis.horizontal,
-                        groupValue: groupValue,
-                        onChanged: (value) => setState(() {
-                          groupValue = value!;
-                        }),
-                        items: ChatOptions.values,
-                        itemBuilder: (item) => RadioButtonBuilder(
-                          describeEnum(item),
+                      onPressed: () {
+                        _pdfViewerKey.currentState?.openBookmarkView();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _searchResult = _pdfViewerController!.searchText(
+                          'the',
+                        );
+                        if (kIsWeb) {
+                          setState(() {});
+                        } else {
+                          _searchResult.addListener(() {
+                            if (_searchResult.hasResult) {
+                              setState(() {});
+                            }
+                          });
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.record_voice_over,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        var data = await Clipboard.getData('text/plain');
+                        data != null ? tts.speak(data.text!) : null;
+                      },
+                    ),
+                    Visibility(
+                      visible: _searchResult.hasResult,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.clear,
+                          color: Colors.white,
                         ),
+                        onPressed: () {
+                          setState(() {
+                            _searchResult.clear();
+                          });
+                        },
                       ),
-                      const SizedBox(
-                        height: 10,
+                    ),
+                    Visibility(
+                      visible: _searchResult.hasResult,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.keyboard_arrow_up,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          _searchResult.previousInstance();
+                        },
                       ),
-                      TextField(
-                          decoration: InputDecoration(
-                              hintText: groupValue == ChatOptions.negative
-                                  ? 'Message not acknowledged'
-                                  : groupValue == ChatOptions.negative
-                                      ? 'seen'
-                                      : "acknowledged",
-                              suffix: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.send))))
-                    ]),
+                    ),
+                    Visibility(
+                      visible: _searchResult.hasResult,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          _searchResult.nextInstance();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                body: SfPdfViewer.asset(
+                  'assets/books/hackathon.pdf',
+                  canShowPasswordDialog: true,
+                  controller: _pdfViewerController,
+                  key: _pdfViewerKey,
+                  currentSearchTextHighlightColor:
+                      Colors.yellow.withOpacity(0.6),
+                  otherSearchTextHighlightColor: Colors.yellow.withOpacity(0.3),
+                  onTextSelectionChanged:
+                      (PdfTextSelectionChangedDetails details) {
+                    if (details.selectedText == null && _overlayEntry != null) {
+                      _overlayEntry?.remove();
+                      _overlayEntry = null;
+                    } else if (details.selectedText != null &&
+                        _overlayEntry == null) {
+                      _showContextMenu(context, details);
+                    }
+                  },
+                ),
               )),
-        )),
-      ],
-    );
+              Expanded(
+                  child: Scaffold(
+                appBar: AppBar(backgroundColor: Colors.blue),
+                body: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: SingleChildScrollView(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text("MINUTES",
+                                style: TextStyle(fontSize: 20)),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const MyStatefulWidget(),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            DropdownButton(
+                                hint: const Text("Select Reciever"),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'Engr gambo',
+                                    child: Text("Engr Gambo"),
+                                  ),
+                                  DropdownMenuItem(
+                                      value: "Mrs. Ake",
+                                      child: Text("Mrs. Ake")),
+                                  DropdownMenuItem(
+                                      value: "Engr sabo",
+                                      child: Text("Engr Sabo")),
+                                ],
+                                onChanged: (selected) {}),
+                            RadioGroup<ChatOptions>.builder(
+                              direction: Axis.horizontal,
+                              groupValue: groupValue,
+                              onChanged: (value) => setState(() {
+                                groupValue = value!;
+                              }),
+                              items: ChatOptions.values,
+                              itemBuilder: (item) => RadioButtonBuilder(
+                                describeEnum(item),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextField(
+                                decoration: InputDecoration(
+                                    hintText: groupValue == ChatOptions.negative
+                                        ? 'Message not acknowledged'
+                                        : groupValue == ChatOptions.negative
+                                            ? 'seen'
+                                            : "acknowledged",
+                                    suffix: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.send))))
+                          ]),
+                    )),
+              )),
+            ],
+          );
   }
 
   void _showContextMenu(
